@@ -45,9 +45,6 @@ return buffer
 
 loggermek = false
 printmek = false
-selfbot = true
-
-
 
 
 module.exports = slowed = async(slowed, mek, store) => {
@@ -263,7 +260,7 @@ plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text,
 }
 }
 //modo selfbot
-if(selfbot) {
+if(config.selfbot) {
 if (!isOwner) return;
 }
 //comandos dps do modo selfbot 
@@ -288,13 +285,15 @@ break
 
 case 'publico':
 if (!isOwner) return enviar('só o meu dono pode usar isso');
-selfbot = false
+config.selfbot = false
+await fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
 enviar('modo publico ativado')
 break
 
 case 'privado':
 if (!isOwner) return enviar('só o meu dono pode usar isso');
-selfbot = true
+config.selfbot = true
+await fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
 enviar('modo privado')
 break
 
