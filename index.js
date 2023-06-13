@@ -14,17 +14,19 @@ const {
  const axios = require('axios')
 
 async function atualizar () {
-//https://raw.githubusercontent.com/kauannre/atualizacaodobot/main/atualizacao.json
 const verificar = await axios.get("https://raw.githubusercontent.com/kauannre/atualizacaodobot/main/versao.json")
-if(!config.atualizarautomatico) return console.log("modo atualizar automatico desativado, inicando o bot")
-if(config.versao == verificar.data.versao) return console.log(`voce esta utilizando o slowed mais recente(${config.versao}), iniciando o bot`)
+if(!config.atualizarautomatico) return console.log("modo atualizar automatico desativado\ninicando o bot")
+if(config.versao == verificar.data.versao) return console.log(`voce esta utilizando o slowed mais recente(${config.versao})\niniciando o bot`)
 const aindex = await axios.get("https://raw.githubusercontent.com/kauannre/atualizacaodobot/main/index.js")
 const oslowed = await axios.get("https://raw.githubusercontent.com/kauannre/atualizacaodobot/main/slowed.js")
+
+console.log(`atualizando seu slowed para a versao ${verificar.data.versao}\n`)
+console.log(`oque foi adicionado: ${verificar.data.nota}\n`)
 await fs.writeFileSync('./index.js', aindex.data)
 await fs.writeFileSync('./slowed.js', oslowed.data)
 config.versao = verificar.data.versao
 fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
-console.log(`pronto, slowed atualizado para a versão ${verificar.data.versao}`)
+console.log(`pronto, slowed atualizado!`)
 console.log("reinicie o bot")
 process.exit()
 }
