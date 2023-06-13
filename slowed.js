@@ -345,7 +345,7 @@ enviar('plugin apagado')
 break
 
 case 'lerplugin':
-enviar(fs.readFileSync(`./plugins/${text.split('|•|')[0]}`))
+enviar(fs.readFileSync(`./plugins/${text}.js`))
 break
 
 case 'criarplugin':
