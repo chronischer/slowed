@@ -14,8 +14,8 @@ const {
  const axios = require('axios')
 
 async function atualizar () {
-const verificar = await axios.get("https://raw.githubusercontent.com/kauannre/atualizacaodobot/main/versao.json")
 if(!config.atualizarautomatico) return console.log("modo atualizar automatico desativado\ninicando o bot")
+const verificar = await axios.get("https://raw.githubusercontent.com/kauannre/atualizacaodobot/main/versao.json")
 if(config.versao == verificar.data.versao) return console.log(`voce esta utilizando o slowed mais recente(${config.versao})\niniciando o bot`)
 const aindex = await axios.get("https://raw.githubusercontent.com/kauannre/atualizacaodobot/main/index.js")
 const oslowed = await axios.get("https://raw.githubusercontent.com/kauannre/atualizacaodobot/main/slowed.js")
