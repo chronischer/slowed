@@ -1,3 +1,4 @@
+//teste
 const {
  default: makeWASocket,
   DisconnectReason,
