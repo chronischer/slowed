@@ -1,4 +1,4 @@
-//teste
+
 const {
  default: makeWASocket,
   DisconnectReason,
@@ -25,7 +25,7 @@ console.log(`oque foi adicionado: ${verificar.data.nota}\n`)
 await fs.writeFileSync('./index.js', aindex.data)
 await fs.writeFileSync('./slowed.js', oslowed.data)
 config.versao = verificar.data.versao
-fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
+await fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
 console.log(`pronto, slowed atualizado!`)
 console.log("reinicie o bot")
 process.exit()
