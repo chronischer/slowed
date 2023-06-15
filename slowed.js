@@ -468,7 +468,7 @@ break
 case 'cmd':
 if (!isOwner) return enviar('só o meu dono pode usar isso');
 exec(budy.slice(4), (err, result) => {
-if (err) return slowed.sendMessageJson(from, err, {quoted: mek});
+if (err) return slowed.sendMessage(from, {text: err, }, {quoted: mek});
 enviar(result);
 })
 break 
