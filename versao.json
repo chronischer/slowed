@@ -1,4 +1,4 @@
 {
-  "versao": "1.2",
-  "nota": "1.2: o bot vai carregar mais rapido q antes quando a opção de atualizar estiver desativada\n1.1: correção do erro no comando lerplugin"
+  "versao": "1.3",
+  "nota": "1.3: correção do erro no comando cmd(desligava o bot)\n1.2: o bot vai carregar mais rapido q antes quando a opção de atualizar estiver desativada\n1.1: correção do erro no comando lerplugin"
 }
