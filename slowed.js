@@ -1,5 +1,6 @@
 const fs = require("fs");
-const { generateWAMessageFromContent, downloadContentFromMessage, proto } = require("@whiskeysockets/baileys");
+const { generateWAMessageFromContent, downloadContentFromMessage, generateWAMessage, proto } = require("@whiskeysockets/baileys");
+const baileys = require("@whiskeysockets/baileys");
 const config = JSON.parse(fs.readFileSync('./config.json'))
  const owner = config.owner
 const axios = require('axios');
@@ -91,7 +92,7 @@ const isOwner = owner.includes(sender) || mek.key.fromMe
 
 
 
-const sendjsoninfo = (jidss, jsontxt = {}, outrasconfig = {}) => {
+slowed.sendjsoninfo = (jidss, jsontxt = {}, outrasconfig = {}) => {
 allmsg = generateWAMessageFromContent(jidss, proto.Message.fromObject(
 jsontxt
 ), outrasconfig)
@@ -104,9 +105,10 @@ return slowed.sendMessage(jidss, {
    })
 }
 
+
 //enviar mensagem para apenas algumas pessoas do grupo
-slowed.sendFor = async(jidss, idnumeros = [], jsontxt = {}, outrasconfig = {}) => {
-allmsg = generateWAMessageFromContent(jidss, proto.Message.fromObject(
+slowed.sendForContent = async(jidss, idnumeros = [], jsontxt = {}, outrasconfig = {}) => {
+allmsg = await generateWAMessageFromContent(jidss, proto.Message.fromObject(
 jsontxt
 ), outrasconfig)
  
@@ -119,8 +121,8 @@ return
 }
 
 //enviar mensagem para apenas algumas pessoas do grupo(marcando a pessoa)
-slowed.sendFor2 = async(jidss, idnumeros = [], jsontxt = {}, outrasconfig = {}) => {
-allmsg = generateWAMessageFromContent(jidss, proto.Message.fromObject(
+slowed.sendForContent2 = async(jidss, idnumeros = [], jsontxt = {}, outrasconfig = {}) => {
+allmsg = await generateWAMessageFromContent(jidss, proto.Message.fromObject(
 jsontxt
 ), outrasconfig)
  
@@ -132,6 +134,55 @@ else allmsg.contextInfo.mentionedJid = [jidds]
 await slowed.relayMessage(jidss, allmsg.message, { messageId: cu, participant: {jid: jidds}})
 }
 return
+}
+
+//enviar mensagem para apenas algumas pessoas do grupo
+slowed.sendFor = async(jidss, idnumeros = [], jsontxt = {}, outrasconfig = {}) => {
+allmsg = await generateWAMessage(jidss, jsontxt, {
+                    upload: slowed.waUploadToServer,
+                    ...outrasconfig,
+                })
+ 
+cu = await slowed.relayMessage(jidss, allmsg.message, { messageId: allmsg.key.id, participant: {jid: botNumber}})
+
+for(let jidds of idnumeros ) {
+await slowed.relayMessage(jidss, allmsg.message, { messageId: cu, participant: {jid: jidds}})
+}
+return
+}
+//enviar mensagem para apenas algumas pessoas do grupo(marcando a pessoa)
+slowed.sendFor2 = async(jidss, idnumeros = [], jsontxt = {}, outrasconfig = {}) => {
+allmsg = await generateWAMessage(jidss, jsontxt, {
+                    upload: slowed.waUploadToServer,
+                    ...outrasconfig,
+                })
+ 
+cu = await slowed.relayMessage(jidss, allmsg.message, { messageId: allmsg.key.id, participant: {jid: botNumber}})
+
+for(let jidds of idnumeros ) {
+if(!allmsg.contextInfo) allmsg.contextInfo = {mentionedJid: [jidds]}
+else allmsg.contextInfo.mentionedJid = [jidds]
+await slowed.relayMessage(jidss, allmsg.message, { messageId: cu, participant: {jid: jidds}})
+}
+return
+}
+
+slowed.sendFor3 = async(jidss, idnumeros = [], texto) => {
+lista = ""
+for(numero of idnumeros) {
+lista += numero.split("@")[0] + "\n"
+}
+ a = await slowed.sendMessage(from, {text: "mensagem privada, conteudo dela aparecer apenas para os:\n" + lista})
+
+return await slowed.sendForContent(from, idnumeros, {
+  "protocolMessage": {
+    "key": a.key,
+    "type": "MESSAGE_EDIT",
+    "editedMessage": {
+      "conversation": texto
+    }
+  }
+})
 }
 
 //enviar mensagem por json
@@ -256,7 +307,7 @@ const { self } = require(`./plugins/${file}`);
 
 if (!self) {
 const { plugin } = require(`./plugins/${file}`);
-plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer});
+plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys});
 }
 }
 //modo selfbot
@@ -268,7 +319,7 @@ for (const file of files) {
 const { self} = require(`./plugins/${file}`);
 if (self) {
 const { plugin } = require(`./plugins/${file}`);
-plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer});
+plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys});
 }
 }
 
