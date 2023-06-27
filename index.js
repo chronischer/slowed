@@ -21,7 +21,7 @@ const aindex = await axios.get("https://raw.githubusercontent.com/kauannre/atual
 const oslowed = await axios.get("https://raw.githubusercontent.com/kauannre/atualizacaodobot/main/slowed.js")
 
 console.log(`atualizando seu slowed para a versao ${verificar.data.versao}\n`)
-console.log(`oque foi adicionado: ${verificar.data.nota}\n`)
+console.log(`ATUALIZAÇÕES\n ${verificar.data.nota}\n`)
 await fs.writeFileSync('./index.js', aindex.data)
 await fs.writeFileSync('./slowed.js', oslowed.data)
 config.versao = verificar.data.versao
@@ -84,7 +84,7 @@ const { state, saveCreds } = await useMultiFileAuthState("./connection")
 
    } else if (connection === 'open') {
     slowed.sendMessage(owner[0], {
-     text: 'Bot conectado'
+     text: 'Bot conectado\nme mande uma mensagem qualquer para ativar todas funções.'
     });
     console.log('opened connection');
    }
