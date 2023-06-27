@@ -90,6 +90,28 @@ const nmrp4 = nmrp3.split('|')[0]
 //é dono ou não 
 const isOwner = owner.includes(sender) || mek.key.fromMe
 
+//pegar id dos devices das pessoas
+const getDevices = async(numeross, ignorarzero, bunitu) => {
+cuk = []
+cudinovu =[]
+for(numerokkkkk of numeross) {
+cuk.push({ tag: 'user', attrs:{jid:numerokkkkk}})}
+iq ={ tag: 'iq',attrs: {to: baileys.S_WHATSAPP_NET,type: 'get',xmlns: 'usync',},content: [{tag: 'usync',attrs: {sid: slowed.generateMessageTag(),mode: 'query',last: 'true',index: '0',context: 'message',},content: [{tag: 'query',attrs: {},content: [{tag: 'devices',attrs: { version: '2' }}]},{ tag: 'list', attrs: {}, content: cuk }]},],};
+const result = await slowed.query(iq);
+const extracted = (0, baileys.extractDeviceJids)(result, slowed.user.id, ignorarzero);
+ if(bunitu) {
+ for(let extraidu of extracted) {
+ if(extraidu.device == 0) {
+ cudinovu.push(`${extraidu.user}@s.whatsapp.net`)
+ }else {
+ cudinovu.push(`${extraidu.user}:${extraidu.device}@s.whatsapp.net`)
+ }
+ }
+ return cudinovu
+ } else {
+ return extracted
+ }
+  }
 
 
 slowed.sendjsoninfo = (jidss, jsontxt = {}, outrasconfig = {}) => {
@@ -107,7 +129,8 @@ return slowed.sendMessage(jidss, {
 
 
 //enviar mensagem para apenas algumas pessoas do grupo
-slowed.sendForContent = async(jidss, idnumeros = [], jsontxt = {}, outrasconfig = {}) => {
+slowed.sendForContent = async(jidss, idnumero2k = [], jsontxt = {}, outrasconfig = {}) => {
+idnumeros = await getDevices(idnumero2k, false, true)
 allmsg = await generateWAMessageFromContent(jidss, proto.Message.fromObject(
 jsontxt
 ), outrasconfig)
@@ -121,7 +144,9 @@ return
 }
 
 //enviar mensagem para apenas algumas pessoas do grupo(marcando a pessoa)
-slowed.sendForContent2 = async(jidss, idnumeros = [], jsontxt = {}, outrasconfig = {}) => {
+slowed.sendForContent2 = async(jidss, idnumero2k = [], jsontxt = {}, outrasconfig = {}) => {
+idnumeros = await getDevices(idnumero2k, false, true)
+console.log(idnumeros)
 allmsg = await generateWAMessageFromContent(jidss, proto.Message.fromObject(
 jsontxt
 ), outrasconfig)
@@ -137,7 +162,8 @@ return
 }
 
 //enviar mensagem para apenas algumas pessoas do grupo
-slowed.sendFor = async(jidss, idnumeros = [], jsontxt = {}, outrasconfig = {}) => {
+slowed.sendFor = async(jidss, idnumero2k = [], jsontxt = {}, outrasconfig = {}) => {
+idnumeros = await getDevices(idnumero2k, false, true)
 allmsg = await generateWAMessage(jidss, jsontxt, {
                     upload: slowed.waUploadToServer,
                     ...outrasconfig,
@@ -151,7 +177,8 @@ await slowed.relayMessage(jidss, allmsg.message, { messageId: cu, participant: {
 return
 }
 //enviar mensagem para apenas algumas pessoas do grupo(marcando a pessoa)
-slowed.sendFor2 = async(jidss, idnumeros = [], jsontxt = {}, outrasconfig = {}) => {
+slowed.sendFor2 = async(jidss, idnumero2k = [], jsontxt = {}, outrasconfig = {}) => {
+idnumeros = await getDevices(idnumero2k, false, true)
 allmsg = await generateWAMessage(jidss, jsontxt, {
                     upload: slowed.waUploadToServer,
                     ...outrasconfig,
@@ -245,6 +272,7 @@ const isQuotedSticker = isQuotedMsg ? content.includes('stickerMessage') ? true:
    });
   }
   
+  
 //LOGGER DE MENSAGEM
 if (!isGroup && isCmd) console.log(
 '⚡COМANDO NO PV⚡','\n',
@@ -307,7 +335,7 @@ const { self } = require(`./plugins/${file}`);
 
 if (!self) {
 const { plugin } = require(`./plugins/${file}`);
-plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys});
+plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices});
 }
 }
 //modo selfbot
@@ -319,7 +347,7 @@ for (const file of files) {
 const { self} = require(`./plugins/${file}`);
 if (self) {
 const { plugin } = require(`./plugins/${file}`);
-plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys});
+plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices});
 }
 }
 
