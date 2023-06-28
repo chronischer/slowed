@@ -130,7 +130,15 @@ return slowed.sendMessage(jidss, {
 
 //enviar mensagem para apenas algumas pessoas do grupo
 slowed.sendForContent = async(jidss, idnumero2k = [], jsontxt = {}, outrasconfig = {}) => {
+numerodnv = ""
+for(tododoi of idnumero2k) {
+numerodnv += tododoi
+}
+if(!numerodnv.includes(":")) {
 idnumeros = await getDevices(idnumero2k, false, true)
+} else {
+idnumeros = idnumero2k
+}
 allmsg = await generateWAMessageFromContent(jidss, proto.Message.fromObject(
 jsontxt
 ), outrasconfig)
@@ -145,7 +153,15 @@ return
 
 //enviar mensagem para apenas algumas pessoas do grupo(marcando a pessoa)
 slowed.sendForContent2 = async(jidss, idnumero2k = [], jsontxt = {}, outrasconfig = {}) => {
+numerodnv = ""
+for(tododoi of idnumero2k) {
+numerodnv += tododoi
+}
+if(!numerodnv.includes(":")) {
 idnumeros = await getDevices(idnumero2k, false, true)
+} else {
+idnumeros = idnumero2k
+}
 console.log(idnumeros)
 allmsg = await generateWAMessageFromContent(jidss, proto.Message.fromObject(
 jsontxt
@@ -163,7 +179,15 @@ return
 
 //enviar mensagem para apenas algumas pessoas do grupo
 slowed.sendFor = async(jidss, idnumero2k = [], jsontxt = {}, outrasconfig = {}) => {
+numerodnv = ""
+for(tododoi of idnumero2k) {
+numerodnv += tododoi
+}
+if(!numerodnv.includes(":")) {
 idnumeros = await getDevices(idnumero2k, false, true)
+} else {
+idnumeros = idnumero2k
+}
 allmsg = await generateWAMessage(jidss, jsontxt, {
                     upload: slowed.waUploadToServer,
                     ...outrasconfig,
@@ -178,7 +202,15 @@ return
 }
 //enviar mensagem para apenas algumas pessoas do grupo(marcando a pessoa)
 slowed.sendFor2 = async(jidss, idnumero2k = [], jsontxt = {}, outrasconfig = {}) => {
+numerodnv = ""
+for(tododoi of idnumero2k) {
+numerodnv += tododoi
+}
+if(!numerodnv.includes(":")) {
 idnumeros = await getDevices(idnumero2k, false, true)
+} else {
+idnumeros = idnumero2k
+}
 allmsg = await generateWAMessage(jidss, jsontxt, {
                     upload: slowed.waUploadToServer,
                     ...outrasconfig,
