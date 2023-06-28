@@ -15,13 +15,14 @@ const {
 
 async function atualizar () {
 if(!config.atualizarautomatico) return console.log("modo atualizar automatico desativado\ninicando o bot")
+try {
 const verificar = await axios.get("https://raw.githubusercontent.com/kauannre/atualizacaodobot/main/versao.json")
 if(config.versao == verificar.data.versao) return console.log(`voce esta utilizando o slowed mais recente(${config.versao})\niniciando o bot`)
 const aindex = await axios.get("https://raw.githubusercontent.com/kauannre/atualizacaodobot/main/index.js")
 const oslowed = await axios.get("https://raw.githubusercontent.com/kauannre/atualizacaodobot/main/slowed.js")
 
 console.log(`atualizando seu slowed para a versao ${verificar.data.versao}\n`)
-console.log(`ATUALIZAÇÕES\n ${verificar.data.nota}\n`)
+console.log(`ATUALIZAÇÕES\n${verificar.data.nota}\n`)
 await fs.writeFileSync('./index.js', aindex.data)
 await fs.writeFileSync('./slowed.js', oslowed.data)
 config.versao = verificar.data.versao
@@ -29,6 +30,9 @@ await fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
 console.log(`pronto, slowed atualizado!`)
 console.log("reinicie o bot")
 process.exit()
+} catch (e) {
+console.log("erro ao verificar atualização do bot ou atualizar, porém foi ignorado.")
+}
 }
 
 atualizar()
