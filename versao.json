@@ -1,4 +1,4 @@
 {
-  "versao": "2.1",
-  "nota": "2.1: adicionado a função getDevices e arrumado um problema de todos os sendfor\n2: sendfor melhorado e sendfor3 adicionado, o sendfor antigo virou sendforcontent,mais imports pros plugins\n1.3: correção do erro no comando cmd(desligava o bot)\n1.2: o bot vai carregar mais rapido q antes quando a opção de atualizar estiver desativada\n1.1: correção do erro no comando lerplugin"
+  "versao": "2.1.1",
+  "nota": "2.1.1: melhorei um bglh no sendfor KKKKK\n2.1: adicionado a função getDevices e arrumado um problema de todos os sendfor\n2: sendfor melhorado e sendfor3 adicionado, o sendfor antigo virou sendforcontent,mais imports pros plugins\n1.3: correção do erro no comando cmd(desligava o bot)\n1.2: o bot vai carregar mais rapido q antes quando a opção de atualizar estiver desativada\n1.1: correção do erro no comando lerplugin"
 }
