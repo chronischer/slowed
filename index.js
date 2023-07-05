@@ -12,7 +12,20 @@ const {
  const config = JSON.parse(fs.readFileSync('./config.json'))
  const owner = config.owner
  const axios = require('axios')
+ 
+ 
+async function checkfun () {
+console.log("checando se voce tem algumas funções")
+textokk = "adicionando:"
+textokk += config?.prefix ? "" : "\nprefixo pela config"
+textokk == "adicionando:" ? console.log("voce tem todas as dependências") : console.log(textokk)
+if(!config?.prefix) {
+ config.prefix = "/"
+ await fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
+ }
+}
 
+//função de atualização automatica
 async function atualizar () {
 if(!config.atualizarautomatico) return console.log("modo atualizar automatico desativado\ninicando o bot")
 try {
@@ -23,6 +36,7 @@ const oslowed = await axios.get("https://raw.githubusercontent.com/kauannre/atua
 
 console.log(`atualizando seu slowed para a versao ${verificar.data.versao}\n`)
 console.log(`ATUALIZAÇÕES\n${verificar.data.nota}\n`)
+await checkfun()
 await fs.writeFileSync('./index.js', aindex.data)
 await fs.writeFileSync('./slowed.js', oslowed.data)
 config.versao = verificar.data.versao
@@ -97,6 +111,7 @@ const { state, saveCreds } = await useMultiFileAuthState("./connection")
   slowed.ev.on('messages.upsert',
    connection => {
     const mek = connection.messages[0];
+     //  console.log(connection.messages[0])
     if (!mek.message) return;
     if (connection.type != 'notify') return;
     if (mek.key.remoteJid === 'status@broadcast') return;
