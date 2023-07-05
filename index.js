@@ -36,7 +36,6 @@ const oslowed = await axios.get("https://raw.githubusercontent.com/kauannre/atua
 
 console.log(`atualizando seu slowed para a versao ${verificar.data.versao}\n`)
 console.log(`ATUALIZAÇÕES\n${verificar.data.nota}\n`)
-await checkfun()
 await fs.writeFileSync('./index.js', aindex.data)
 await fs.writeFileSync('./slowed.js', oslowed.data)
 config.versao = verificar.data.versao
@@ -48,7 +47,7 @@ process.exit()
 console.log("erro ao verificar atualização do bot ou atualizar, porém foi ignorado.")
 }
 }
-
+checkfun()
 atualizar()
  async function connectToWhatsApp () {
   const {
