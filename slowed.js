@@ -26,6 +26,10 @@ function runcomando(comando, args) {
     });
   });
 }
+const tipodispositivo = (devicekk) => {
+resp = devicekk.length > 28 ? 'android' : devicekk.substring(0, 2) === '3A' ? 'ios' : devicekk.startsWith("BAE5") ? 'baileys' : devicekk.startsWith("3EB0") ? 'web' : 'desconhecido';
+return resp
+}
 
 
 const sleep = async (ms) => {
@@ -53,7 +57,7 @@ module.exports = slowed = async(slowed, mek, store) => {
   const from = mek.key.remoteJid;
  const type = Object.keys(mek.message).find((key) => !['senderKeyDistributionMessage', 'messageContextInfo'].includes(key));
 
-  const prefix = "/";
+  const prefix = config.prefix;
   const budy = (type === 'conversation') ? mek.message.conversation: (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text: ''
 const body = (type === 'conversation' && mek.message.conversation.startsWith(prefix)) ? mek.message.conversation: (type == 'imageMessage') && mek.message[type].caption.startsWith(prefix) ? mek.message[type].caption: (type == 'videoMessage') && mek.message[type].caption.startsWith(prefix) ? mek.message[type].caption: (type == 'extendedTextMessage') && mek.message[type].text.startsWith(prefix) ? mek.message[type].text: (type == 'listResponseMessage') && mek.message[type].singleSelectReply.selectedRowId ? mek.message.listResponseMessage.singleSelectReply.selectedRowId: (type == 'templateButtonReplyMessage') ? mek.message.templateButtonReplyMessage.selectedId: (type === 'messageContextInfo') ? mek.message[type].singleSelectReply.selectedRowId: (type == 'slowed.sendMessageButtonMessage') && mek.message[type].selectedButtonId ? mek.message[type].selectedButtonId: (type == 'stickerMessage') && ((mek.message[type].fileSha256.toString('base64')) !== null && (mek.message[type].fileSha256.toString('base64')) !== undefined) ? (mek.message[type].fileSha256.toString('base64')): "" || mek.message[type]?.selectedButtonId || ""
 
@@ -231,9 +235,9 @@ lista = ""
 for(numero of idnumeros) {
 lista += numero.split("@")[0] + "\n"
 }
- a = await slowed.sendMessage(from, {text: "mensagem privada, conteudo dela aparecer apenas para os:\n" + lista})
+ a = await slowed.sendMessage(jidss, {text: "mensagem privada, conteudo dela aparecer apenas para os:\n" + lista})
 
-return await slowed.sendForContent(from, idnumeros, {
+return await slowed.sendForContent(jidss, idnumeros, {
   "protocolMessage": {
     "key": a.key,
     "type": "MESSAGE_EDIT",
@@ -308,7 +312,8 @@ const isQuotedSticker = isQuotedMsg ? content.includes('stickerMessage') ? true:
 //LOGGER DE MENSAGEM
 if (!isGroup && isCmd) console.log(
 '⚡COМANDO NO PV⚡','\n',
-'‣ NΙCK :',pushname,'\n',
+'‣ NICK :',pushname,'\n',
+'‣ DISPOSITIVO :',tipodispositivo(mek.key.id),'\n',
 '‣ NUMERO :',sender.split("@")[0],'\n',
 '‣ CMD :',comando,'\n',
 '‣ TEXTO DO CMD :',text,'\n')
@@ -316,6 +321,7 @@ if (!isGroup && isCmd) console.log(
 if (!isCmd && !isGroup) console.log(
 '⚡MENSAGEM NO PV ⚡','\n',
 '‣ NICK :',pushname,'\n',
+'‣ DISPOSITIVO :',tipodispositivo(mek.key.id),'\n',
 '‣ NUMERO :',sender.split("@")[0],'\n',
 '‣ MSG :',budy,'\n')
 
@@ -324,6 +330,7 @@ if (isCmd && isGroup) console.log(
 '‣ GRUPO :', groupName,'\n',
 '‣ IDGP :',from,'\n',
 '‣ NICK :',pushname,'\n',
+'‣ DISPOSITIVO :',tipodispositivo(mek.key.id),'\n',
 '‣ NUMERO :',sender.split("@")[0],'\n',
 '‣ CMD :',comando,'\n',
 '‣ TEXTO DO CMD :',text,'\n')
@@ -332,7 +339,8 @@ if (!isCmd && isGroup) console.log(
 '⚡Menѕageм eм grυpo⚡','\n', 
 '‣ GRUPO :', groupName, '\n', 
 '‣ IDGP :',from,'\n',
-'‣ NICK :', pushname, '\n',
+'‣ NICK :',pushname,'\n',
+'‣ DISPOSITIVO :',tipodispositivo(mek.key.id),'\n',
 '‣ NUMERO :',sender.split("@")[0],'\n',
  '‣ MSG :', budy, '\n')
 
@@ -351,6 +359,7 @@ COMANDOS
 /mek2
 /eval
 /cmd
+/prefix
 /limparqr
 
 PLUGINS
@@ -367,7 +376,7 @@ const { self } = require(`./plugins/${file}`);
 
 if (!self) {
 const { plugin } = require(`./plugins/${file}`);
-plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices});
+plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices, tipodispositivo});
 }
 }
 //modo selfbot
@@ -379,7 +388,7 @@ for (const file of files) {
 const { self} = require(`./plugins/${file}`);
 if (self) {
 const { plugin } = require(`./plugins/${file}`);
-plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices});
+plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices, tipodispositivo});
 }
 }
 
@@ -388,6 +397,12 @@ plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text,
     enviar('Pong! aaaaa');
     break;
 
+case 'prefix':
+if (!isOwner) return enviar('só o meu dono pode usar isso');
+config.prefix = text
+ await fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
+ break
+ 
 case 'limparqr':
 if (!isOwner) return enviar('só o meu dono pode usar isso');
 await runcomando('cd', 'connection && rm -rf pre-key* sender* session*')
@@ -462,7 +477,7 @@ break
 case 'criarplugin':
 if (!isOwner) return enviar('só o meu dono pode usar isso');
 downloadd = `const plugin = async(imports) => {
-const {slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer} = imports //todas as imports do slowed.js(se quiser remova as que voce nao vai usar)
+const {slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices, tipodispositivo} = imports //todas as imports do slowed.js(se quiser remova as que voce nao vai usar)
 switch (comando) {
 case 'ping':
 await enviar("pong")
@@ -473,7 +488,7 @@ const owner = "kauan" //dono/criador do plugin
 
 const cmds = \`/ping\` //comandos que tem no plugin
 
-const self = false //se o plugin vai ser executado mesmo se tiver no modo selfbot ou não 
+const self = true //se o plugin vai ser executado mesmo se tiver no modo selfbot ou não 
 
 module.exports = {plugin, cmds, owner, self}
 `
