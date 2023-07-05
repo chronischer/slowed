@@ -401,6 +401,7 @@ case 'prefix':
 if (!isOwner) return enviar('só o meu dono pode usar isso');
 config.prefix = text
  await fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
+ enviar("pronto")
  break
  
 case 'limparqr':
