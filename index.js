@@ -135,7 +135,7 @@ const { state, saveCreds } = await useMultiFileAuthState("./connection")
   
   mensagens = []
   
-  slowed.reactBtn = async(jids, msg = {}, opcoes = [], type = "") => {
+  slowed.reactBtn = async(jids, msg = {}, opcoes = []) => {
 msgpraadd= await slowed.sendMessage(jids, msg)
 msgpraadd.opcoes = opcoes
 mensagens.push(msgpraadd)
