@@ -276,7 +276,8 @@ return slowed.relayMessage(jidss, jsontxt, outrasconfig)
     
     if(loggermek) {
     await fs.writeFileSync('./loggermek', JSON.stringify(mek, null, 2));
-slowed.sendMessage(owner[0], { document: fs.readFileSync('./loggermek'), mimetype: 'text/plain', fileName: 'mek da mensagem aqui.json'}, {quoted: mek})
+    mekk = await fs.readFileSync('./loggermek')
+slowed.sendMessage(owner[0], { document: mekk, mimetype: 'text/plain', fileName: 'mek da mensagem aqui.json'}, {quoted: mek})
 fs.unlinkSync('./mek')
     }
 const premium = JSON.parse(fs.readFileSync('./lib/premium.json'));
@@ -350,9 +351,8 @@ menu = `MENU DO SLOWED CLIENT
 COMANDOS
 /printmek [on/off]
 /loggermek [on/off]
+/self [false/true/all]
 /msgjson
-/publico
-/privado
 /apagarplugin
 /getallgps
 /mek
@@ -369,6 +369,9 @@ for (const file of files) {
 const { cmds, owner } = require(`./plugins/${file}`);
 menu += file + ` - ${owner}
 ${cmds}\n`
+}
+if(config.selfbot == null) {
+if (!isOwner) return;
 }
 //comandos antes do modo selfbot
 for (const file of files) {
@@ -410,18 +413,16 @@ await runcomando('cd', 'connection && rm -rf pre-key* sender* session*')
 enviar('pronto, qrcode limpo(se as mensagens continuar em aguarde reinicie o bot)')
 break
 
-case 'publico':
+case 'self':
 if (!isOwner) return enviar('só o meu dono pode usar isso');
-config.selfbot = false
+configproself = text == "false" ? false : text == "true" ? true : text == "all" ? null : "erro"
+if(configproself == "erro") return enviar(`so pode: false/true/all
+false = desativado
+true = ativado
+all = ativado para todos os comandos(inclusive os que são "publicos")`)
+config.selfbot = configproself
 await fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
 enviar('modo publico ativado')
-break
-
-case 'privado':
-if (!isOwner) return enviar('só o meu dono pode usar isso');
-config.selfbot = true
-await fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
-enviar('modo privado')
 break
 
 case 'printmek':
@@ -449,6 +450,7 @@ enviar('modo dev mek(no pv) desativado')
 break
 
 case 'comandos':
+if(!text) return enviar('cade o texto?')
 let pluginkk = require(`./plugins/${text}`);
 enviar(`${text}.js - ${pluginkk.owner}
 ${pluginkk.cmds}`)
@@ -472,11 +474,14 @@ enviar('plugin apagado')
 break
 
 case 'lerplugin':
+if (!isOwner) return enviar('só o meu dono pode usar isso');
+if(!text) return enviar('cade o texto?')
 enviar(fs.readFileSync(`./plugins/${text}.js`))
 break
 
 case 'criarplugin':
 if (!isOwner) return enviar('só o meu dono pode usar isso');
+if(!text) return enviar('cade o texto?')
 downloadd = `const plugin = async(imports) => {
 const {slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices, tipodispositivo} = imports //todas as imports do slowed.js(se quiser remova as que voce nao vai usar)
 switch (comando) {
@@ -589,11 +594,13 @@ fs.unlinkSync('./mek')
 break;
 
 case 'msgjson':
+if(!text) return enviar('cade o texto?')
 slowed.sendMessage(from, {text: JSON.stringify(text, null, 2)}, {quoted: mek});
 break
 
 case 'cmd':
 if (!isOwner) return enviar('só o meu dono pode usar isso');
+if(!text) return enviar('cade o texto?')
 exec(budy.slice(4), (err, result) => {
 if (err) return slowed.sendMessage(from, {text: err, }, {quoted: mek});
 enviar(result);
@@ -602,6 +609,7 @@ break
 
    case 'eval':
    if (!isOwner) return enviar('só o meu dono pode usar isso');
+   if(!text) return enviar('cade o texto?')
     try {
      eval(`(async () => {
       try {
