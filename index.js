@@ -1,8 +1,11 @@
 
+
+
+
 const {
  default: makeWASocket,
   DisconnectReason,
-  fetchLatestBaileysVersion, useMultiFileAuthState, makeInMemoryStore
+  fetchLatestBaileysVersion, useMultiFileAuthState, makeInMemoryStore, getAggregateVotesInPollMessage, generateWAMessage, proto
  } = require('@whiskeysockets/baileys');
 
  require("qrcode-terminal");
@@ -49,12 +52,23 @@ console.log("erro ao verificar atualização do bot ou atualizar, porém foi ign
 }
 checkfun()
 atualizar()
+
+const store = makeInMemoryStore({
+      logger: pino().child({
+        level: 'silent', stream: 'store'
+      })
+    })
+    
  async function connectToWhatsApp () {
   const {
    version
   } = await fetchLatestBaileysVersion();
   
 const { state, saveCreds } = await useMultiFileAuthState("./connection")
+
+    // Store
+    
+
 
 //, silent ou debug
   const slowed = makeWASocket({
@@ -66,17 +80,17 @@ const { state, saveCreds } = await useMultiFileAuthState("./connection")
    browser: ['Slowed Client', 'Chrome', '4.0'],
    version: version,
    auth: state,
-   defaultQueryTimeoutMs: undefined
+   defaultQueryTimeoutMs: undefined,
+   getMessage: async (key) => {
+            if (store) {
+                const msg = await store.loadMessage(key.remoteJid, key.id)
+                return msg.message || undefined
+            }
+            return {
+                conversation: "Ola sou a safira bot"
+            }
+        }
   });
-
-
-
-    // Store
-    const store = makeInMemoryStore({
-      logger: pino().child({
-        level: 'silent', stream: 'store'
-      })
-    })
 
     store.readFromFile('./baileys_store.json')
 
@@ -106,6 +120,69 @@ const { state, saveCreds } = await useMultiFileAuthState("./connection")
     console.log('opened connection');
    }
   });
+  
+  async function getMessage(key){
+        if (store) {
+            const msg = await store.loadMessage(key.remoteJid, key.id)
+            return msg?.message
+        }
+        return {
+            conversation: "Ola sou o slowed"
+        }
+    }
+    
+  slowed.sendPoll = (jid, name = '', values = [], selectableCount = 1) => { return slowed.sendMessage(jid, { poll: { name, values, selectableCount }}) } //"botão" de enquete
+  
+  mensagens = []
+  
+  slowed.reactBtn = async(jids, msg = {}, opcoes = [], type = "") => {
+msgpraadd= await slowed.sendMessage(jids, msg)
+msgpraadd.opcoes = opcoes
+mensagens.push(msgpraadd)
+} //"botão" de reação 
+  
+  slowed.notifyTextMessage = async(text, keydamsg) => {
+const key1 = keydamsg
+        let messages = await generateWAMessage(key1.remoteJid, { text: text }, {})
+        messages.key = key1
+        let msg = {
+            messages: [proto.WebMessageInfo.fromObject(messages)],
+            type: 'notify'
+        }
+        slowed.ev.emit('messages.upsert', msg)
+    }
+  
+
+   slowed.ev.on('messages.update', async chatUpdate => {
+for(const { key, update } of chatUpdate) {
+if(update.pollUpdates && key.fromMe) {
+const pollCreation = await getMessage(key)
+if(pollCreation) {
+const pollUpdate = await getAggregateVotesInPollMessage({
+message: pollCreation,
+pollUpdates: update.pollUpdates,
+})
+var toCmd = pollUpdate.filter(v => v.voters.length !== 0)[0]?.name
+if (toCmd == undefined) return
+var prefCmd = config.prefix+toCmd
+slowed.notifyTextMessage(prefCmd, update.pollUpdates[0].pollUpdateMessageKey)
+}}}})
+
+
+
+slowed.ev.on('messages.upsert',
+ async connection => {
+    const mek = connection.messages[0];
+    if (!mek.message) return;
+    if (connection.type != 'notify') return;
+    if (mek.key.remoteJid === 'status@broadcast') return;
+if(mek.message?.reactionMessage?.key?.id) {
+tem = mensagens.find((sla) => sla.key.id == mek.message.reactionMessage.key.id)
+if(tem) {
+tem2 = tem.opcoes.find((sla) => sla.react == mek.message.reactionMessage.text)
+if(tem2) {
+await slowed.notifyTextMessage(tem2.cmd, mek.key)
+}}}});
 
   slowed.ev.on('messages.upsert',
    connection => {
