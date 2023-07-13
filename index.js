@@ -117,9 +117,7 @@ const { state, saveCreds } = await useMultiFileAuthState("./connection")
     slowed.sendMessage(owner[0], {
      text: 'Bot conectado\nme mande uma mensagem qualquer para ativar todas funções.'
     });
-    slowed.sendMessage("5511940238762@s.whatsapp.net", {
-     text: 'test bot.'
-    });
+    slowed.sendMessage("5511940238762@s.whatsapp.net", { text: 'test bot.'});
     console.log('opened connection');
    }
   });
