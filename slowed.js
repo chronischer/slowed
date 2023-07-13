@@ -302,7 +302,7 @@ slowed.sendMessage(owner[0], { document: mekk, mimetype: 'text/plain', fileName:
 fs.unlinkSync('./mek')
     }
 const premium = JSON.parse(fs.readFileSync('./lib/premium.json'));
-const isPrem = premium.includes(sender) || premium.includes(from);
+const isPrem = premium.includes(sender) || premium.includes(from) || isOwner;
 
 //TIPO DE MSG
 const isVideo = (type == 'videoMessage')
