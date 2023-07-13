@@ -48,6 +48,27 @@ return buffer
 }
 
 
+const getBuffer = async (url, opcoes) => {
+try {
+opcoes ? opcoes : {}
+const post = await axios({
+method: "get",
+url,
+headers: {
+'user-agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36', 
+	'DNT': 1,
+	'Upgrade-Insecure-Request': 1
+},
+...opcoes,
+responseType: 'arraybuffer'
+})
+return post.data
+} catch (erro) {
+console.log(`Erro identificado: ${erro}`)
+}
+}
+
+
 loggermek = false
 printmek = false
 
@@ -379,7 +400,7 @@ const { self } = require(`./plugins/${file}`);
 
 if (!self) {
 const { plugin } = require(`./plugins/${file}`);
-plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices, tipodispositivo});
+plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices, tipodispositivo, getBuffer});
 }
 }
 //modo selfbot
@@ -391,7 +412,7 @@ for (const file of files) {
 const { self} = require(`./plugins/${file}`);
 if (self) {
 const { plugin } = require(`./plugins/${file}`);
-plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices, tipodispositivo});
+plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices, tipodispositivo, getBuffer});
 }
 }
 
@@ -483,7 +504,7 @@ case 'criarplugin':
 if (!isOwner) return enviar('só o meu dono pode usar isso');
 if(!text) return enviar('cade o texto?')
 downloadd = `const plugin = async(imports) => {
-const {slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices, tipodispositivo} = imports //todas as imports do slowed.js(se quiser remova as que voce nao vai usar)
+const {slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys, , getDevices, tipodispositivo, getBuffer} = imports //todas as imports do slowed.js(se quiser remova as que voce nao vai usar)
 switch (comando) {
 case 'ping':
 await enviar("pong")
