@@ -213,7 +213,11 @@ await slowed.notifyTextMessage(tem2.cmd, mek.key)
     if (mek.key.remoteJid === 'status@broadcast') return;
     
     console.log("MENSAGEM RECEBIDA");
+    try {
     require('./slowed')(slowed, mek, store);
+    } catch {
+      
+    }
    });
 
   slowed.ev.on('creds.update',
