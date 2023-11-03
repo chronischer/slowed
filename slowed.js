@@ -196,7 +196,9 @@ const extracted = (0, baileys.extractDeviceJids)(result, slowed.user.id, ignorar
  }
   }
 
-
+slowed.sendPoll = (jid, title, options = []) => {
+slowed.relayMessage(jid, { poll: { title, options}})
+	}
 slowed.sendjsoninfo = (jidss, jsontxt = {}, outrasconfig = {}) => {
 allmsg = generateWAMessageFromContent(jidss, proto.Message.fromObject(
 jsontxt
@@ -660,24 +662,47 @@ break
 case 'criarplugin':
 if (!isOwner) return enviar('só o meu dono pode usar isso');
 if(!text) return enviar('cade o texto?')
-downloadd = `const plugin = async(imports) => {
-const {slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, fs, addkey, iskey, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices, tipodispositivo, getBuffer, uploadTelegraph} = imports //todas as imports do slowed.js(se quiser remova as que voce nao vai usar)
+downloadd = `/* 
+Esse é um exemplo de plugin completo para o SlowedClient
+com 3 exemplos de comandos básicos 
+por favor retire os imports nao usados do plugin quando termina-lo ;)
+
+Adicione na const cmds os comandos do plugin, na const owner seu nome e na const self True ou False (se n souber, deixe true.)
+
+quer saber mais métodos do slpwed e nao quer perguntar? konai tem uma dica pra você! abra no seu navegador
+
+-> https://github.com/chronischer/slowed-doc
+
+sempre bote as cases / comandos dentro do switch.
+*/
+
+const plugin = async(imports) => {
+const {slowed, mek, from, type, prefix, budy, body, comando, isCmd, args, text, me, nameBot, botNumber, content, isGroup, sender, groupMetadata, groupId, groupOwner, groupDesc, groupName, groupMembers, participants, groupAdmins, isGroupAdmins, isBotGroupAdmins, nmrp, nmrp2, nmrp3, nmrp4, isOwner, isVideo, isImage, isSticker, isLocLive, isContato, isCatalogo, isLocalização, isDocumento, iscontactsArray, isMedia, isQuotedMsg, isQuotedImage, isQuotedAudio, isQuotedDocument, isQuotedVideo, isQuotedSticker, enviar, store, axios, fs, addkey, iskey, isPrem, runcomando, sleep, getFileBuffer, baileys, getDevices, tipodispositivo, getBuffer, uploadTelegraph} = imports
+
 switch (comando) {
-case 'ping':
-await enviar("pong")
+case 'exemplo':
+await enviar("eu sou um exemplo")
+break
+case "exemploSendFor":
+await slowed.sendFor(from, [owner, "5512982320504@s.whatsapp.net], {"text": "eu sou um exemplo que so o konai e voce recebem"})
+break
+case "exemploPoll":
+await slowed.sendPoll(from, "escolha um animal", ["Light", "Cachorro", "Gato"])
 break
 }}
 
-const owner = "kauan" //dono/criador do plugin
 
-const cmds = \`/ping\` //comandos que tem no plugin
+const owner = "chronischer"
 
-const self = true //se o plugin vai ser executado mesmo se tiver no modo selfbot ou não 
+const cmds = \`/exemplo
+/exemploSendFor
+/exemploPoll\`
+
+const self = true
 
 module.exports = {plugin, cmds, owner, self}
 `
 fs.writeFileSync(`./plugins/${text}.js`, downloadd);
-
 enviar('plugin criado')
 break
 
