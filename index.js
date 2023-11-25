@@ -7,6 +7,112 @@ const {
  require("qrcode-terminal");
  const pino = require('pino');
  const fs = require('fs');
+ const readline = require('readline');
+
+
+//prompt
+async function digite(prompt) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  return new Promise((resolve) => {
+    rl.question(prompt, (input) => {
+      rl.close();
+      resolve(input);
+    });
+  });
+}
+
+//menu de setas
+function menuSetas(msg = "", options = []) {
+  return new Promise((resolve, reject) => {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+
+    const menuOptions = options.map((option) => ({
+      opcao: option.opcao,
+      resp: option.resp,
+    }));
+
+    // Verifica se a opção 'Sair' já está presente nas opções
+    const sairOption = menuOptions.find((option) => option.opcao.toLowerCase() === 'sair');
+    if (!sairOption) {
+      menuOptions.push({ opcao: 'Sair', resp: '' });
+    }
+
+    let selectedOption = 0;
+
+    function displayMenu() {
+      console.clear();
+      console.log(msg)
+      menuOptions.forEach((option, index) => {
+        if (index === selectedOption) {
+          console.log(`➤ ${option.opcao}`);
+        } else {
+          console.log(option.opcao);
+        }
+      });
+      console.log('\nUse as teclas de seta para cima e para baixo e pressione Enter para selecionar.');
+    }
+
+    displayMenu();
+
+    rl.input.on('keypress', (str, key) => {
+      if (key) {
+        if (key.name === 'up') {
+          if (selectedOption === 0) {
+            selectedOption = menuOptions.length - 1;
+          } else {
+            selectedOption--;
+          }
+          displayMenu();
+        } else if (key.name === 'down') {
+          if (selectedOption === menuOptions.length - 1) {
+            selectedOption = 0;
+          } else {
+            selectedOption++;
+          }
+          displayMenu();
+        } else if (key.name === 'return') {
+          handleChoice(selectedOption);
+        }
+      }
+    });
+
+    function handleChoice(choice) {
+      const selected = menuOptions[choice];
+      if (selected.opcao.toLowerCase() === 'sair') {
+        rl.close();
+        resolve(selected.resp);
+      } else {
+        rl.close();
+        resolve(selected.resp);
+      }
+    }
+
+    rl.on('close', () => {
+    });
+
+    rl.on('SIGINT', () => {
+      console.log('Menu cancelado pelo usuário (Ctrl+C).');
+      rl.close();
+      resolve('Cancelado');
+    });
+  });
+}
+/*
+// Exemplo de uso:
+const options = [
+  { opcao: 'Opção 1', resp: 'sla' },
+  { opcao: 'Opção 2', resp: 'sla2' },
+];
+const resposta = await menuSetas(options);
+
+*/
 
  const config = JSON.parse(fs.readFileSync('./config.json'))
  const owner = config.owner
@@ -50,8 +156,6 @@ process.exit()
 console.log("erro ao verificar atualização do bot ou atualizar, porém foi ignorado.")
 }
 }
-checkfun()
-atualizar()
 
 const store = makeInMemoryStore({
       logger: pino().child({
@@ -66,18 +170,42 @@ const store = makeInMemoryStore({
   
 const { state, saveCreds } = await useMultiFileAuthState("./connection")
 
-    // Store
-    
+await checkfun()
+await atualizar()
+
+//função pta decidir se vai logar com o qr ou por código 
+    async function loginqr() {
+//  let comqr = await digite("\n\nLogar com qrcode ou com código? ('qr' ou 'cod'): ");
+
+  comqr = await menuSetas("como você quer logar o bot?\n", [{opcao: "qrcode", resp: "qr"}, {opcao: "codigo", resp: "cod"},{opcao: "sair", resp: "exit"}])
+  
+  if (comqr === "qr") {
+    return true;
+  } else if (comqr === "cod") {
+     txt = await digite("\n\nnúmero (exemplo: 5511900000000): ");
+    return txt;
+  } else {
+//    console.log("Opção inválida, digite 'qr' ou 'cod'");
+    console.log("saindo...")
+    return process.exit() // Chama a função novamente em caso de opção inválida
+  }
+}
+
+    if (!fs.existsSync("./connection/creds.json")) {
+    loginkk = await loginqr()
+  //  console.log("a")
+} 
 
 
 //, silent ou debug
   const slowed = makeWASocket({
-   printQRInTerminal: true,
+   printQRInTerminal: false,
    logger: pino({
     level: 'silent'
    }),
 
-   browser: ['Slowed Client', 'Chrome', '4.0'],
+   browser: ['Safari (Linux)', '', ''],
+   markOnlineOnConnect: false,
    version: version,
    auth: state,
    defaultQueryTimeoutMs: undefined,
@@ -91,6 +219,10 @@ const { state, saveCreds } = await useMultiFileAuthState("./connection")
             }
         }
   });
+  
+  
+  
+  
 
     store.readFromFile('./baileys_store.json')
 
@@ -100,11 +232,26 @@ const { state, saveCreds } = await useMultiFileAuthState("./connection")
 
     store.bind(slowed.ev) 
 
-  slowed.ev.on('connection.update', (update) => {
+  slowed.ev.on('connection.update', async(update) => {
    const {
-    connection, lastDisconnect
+    connection, lastDisconnect, qr
    } = update;
+   
+   if(qr) {
+   
+   if(loginkk == true) {
+   const qrcode = require('qrcode-terminal');
 
+// Exibe o QR Code no terminal
+console.log(qr)
+qrcode.generate(qr, { small: true });
+} else {
+const code = await slowed.requestPairingCode(loginkk);
+    console.log('Aqui esta seu Codigo de Execuçao', code);
+
+}
+}
+   
    if (connection === 'close') {
     const shouldReconnect = lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut
     console.log('connection closed due to ', lastDisconnect.error, ', reconnecting ', shouldReconnect)
